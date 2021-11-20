@@ -12,15 +12,15 @@ int Game::run()
         // player loses the game
         if(!renderElement())
         {
-           showLoseScreen();
-           break;
+            showLoseScreen();
+            break;
         }
         
         // player enters key (might want to quit)
         auto key = keyHandler();
         if(key == keyHandler::QUIT_KEY)
         {
-           break;
+            break;
         }
         
         // game engine updates the board
@@ -29,10 +29,13 @@ int Game::run()
         // player wins (either continues playing or quits)
         if(!achieved2048 && grid.has2048())
         {
-           const auto winDecision = showWinScreen();
-           if(winDecision == WinDecision::QUIT)
-               break;
+            achieved2048 = true;
+            const auto winDecision = showWinScreen();
+            if(winDecision == WinDecision::QUIT)
+                break;
         }
+
+        showBoard();
     }
     return score;
 }
@@ -54,3 +57,22 @@ bool Game::renderElement()
     }
 }
 
+void showBoard()
+{
+    cv::imshow("2048", grid.getImage()); 
+}
+
+void updateGrid(KeyHandler::Key key)
+{
+
+}
+
+void Game::showLoseScreen()
+{
+
+}
+
+Game::WinDecision Game::showWinScreen()
+{
+    return Game::WinDecision::QUIT;
+}
