@@ -4,6 +4,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include "Grid.hpp"
+#include "Screen.hpp"
 #include "KeyHandler.hpp"
 
 class Game
@@ -13,19 +14,17 @@ public:
     int run();
 
 private:
-    enum class WinDecision
-    {
-        CONTINUE,
-        QUIT
-    }
 
     bool renderElement();
     void showBoard();
-    
+    bool updateGrid(KeyHandler::Key);
+    void showLoseScreen();
+    WinScreen::WinDecision showWinScreen();
+    WinScreen::WinDecision handleWinScreenKeys();
+
+    cv::Mat image {Grid::IMAGE_SIZE, Grid::IMAGE_SIZE, CV_8UC3,CV_RGB(0,0,0)};
     bool achieved2048 {false};
     int score {0};
-    auto window = cv::namedWindow("2048", CV_WINDOW_AUTOSIZE);
-
     Grid grid {};
     KeyHandler keyHandler {};
 };

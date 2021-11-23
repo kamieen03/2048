@@ -1,4 +1,5 @@
 #include "Tile.hpp"
+#include <iostream>
 
 const std::map<int, cv::Scalar> Tile::colorMap = []
 {
@@ -18,27 +19,40 @@ const std::map<int, cv::Scalar> Tile::colorMap = []
     return colorMap;
 }();
 
+const cv::Scalar Tile::FONT_COLOR = CV_RGB(0,0,0);
 
-void Tile::updateTile(int value)
+
+void Tile::updateTile(int val)
 {
-    value = value;
-    setFace(value);
+    value = val;
+    setFaceColor(value);
     if(value != 0)
     {
-        cv::putText(face,
-                    std::to_string(value),
-                    cv::Point(40, 40),
-                    cv::FONT_HERSHEY_DUPLEX,
-                    1.0,
-                    CV_RGB(0, 0, 0),
-                    2);
+        setText(value);
     }
 }
 
-void Tile::setFace(int number)
+void Tile::setText(int val)
 {
-    const auto it = colorMap.find(number);
+    int baseline;
+    cv::Size s = cv::getTextSize(std::to_string(val),
+                                 FONT_FACE,
+                                 FONT_SCALE,
+                                 FONT_THICKNESS,
+                                 &baseline);
+    cv::putText(face,
+                std::to_string(val),
+                cv::Point((TILE_SIZE - s.width) / 2, (TILE_SIZE + s.height) / 2), // bottom-left corner
+                FONT_FACE,
+                FONT_SCALE,
+                FONT_COLOR,
+                FONT_THICKNESS);
+}
+
+void Tile::setFaceColor(int val)
+{
+    const auto it = colorMap.find(val);
     const auto color = (it != colorMap.end()) ? it->second : colorMap.at(2048);
-    face = cv::Mat(100, 100, CV_8UC3, color);
+    face = cv::Mat(TILE_SIZE, TILE_SIZE, CV_8UC3, color);
 }
 

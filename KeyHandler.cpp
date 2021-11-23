@@ -1,17 +1,19 @@
 #include "KeyHandler.hpp"
 
-const std::array<int, 5> KeyHandler::validKeys {119, 97, 115, 100, 27};
-
 KeyHandler::Key KeyHandler::operator()()
 {
     int key = 0;
-    while(!validKey(key))
+    while(!validInGameKey(key))
         key = cv::waitKey() & 0xFF;
-    return static_cast<KeyHandler::Key>(key);
+    return KeyHandler::Key(key);
 }
 
-bool validKey(int key)
+bool KeyHandler::validInGameKey(int key)
 {
+    static constexpr std::array<Key, 5> validKeys
+    {
+        Key::UP, Key::DOWN, Key::LEFT, Key::RIGHT, Key::QUIT
+    };
     return std::any_of(validKeys.begin(),
                        validKeys.end(),
                        [&key](int vk){return vk == key;});

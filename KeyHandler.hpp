@@ -1,3 +1,5 @@
+#pragma once
+
 #include <opencv2/highgui.hpp>
 #include <array>
 #include <algorithm>
@@ -5,17 +7,17 @@
 class KeyHandler
 {
 public:
-    enum class Key: int
+    enum Key
     {
         UP = 119,
         LEFT = 97,
         DOWN = 115,
         RIGHT = 100,
-        QUIT = 27
-    }
-
-    Key operator()();
+        QUIT = 27,
+        ENTER = 13
+    };
+    KeyHandler::Key operator()();
 
 private:
-    const static std::array<int, 5> validKeys;
-}
+    bool validInGameKey(int);
+};

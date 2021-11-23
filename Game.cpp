@@ -1,41 +1,47 @@
 #include "Game.hpp"
+#include <iostream>
+#define LOG(X) std::cout << X << std::endl;
 
 Game::Game()
 {
     srand(time(NULL));
+    cv::namedWindow("2048", CV_WINDOW_AUTOSIZE);
 }
 
 int Game::run()
 {
+    showBoard();
+    bool changed = true;
     while(true)
     {
         // player loses the game
-        if(!renderElement())
+        if(changed and !renderElement())    // using lazy evaluation
         {
             showLoseScreen();
             break;
         }
+        showBoard();
         
         // player enters key (might want to quit)
         auto key = keyHandler();
-        if(key == keyHandler::QUIT_KEY)
+        if(key == KeyHandler::Key::QUIT)
         {
             break;
         }
         
         // game engine updates the board
-        updateGrid(key);
+        changed = updateGrid(key);
+        showBoard();
 
         // player wins (either continues playing or quits)
         if(!achieved2048 && grid.has2048())
         {
             achieved2048 = true;
             const auto winDecision = showWinScreen();
-            if(winDecision == WinDecision::QUIT)
+            if(winDecision == WinScreen::WinDecision::QUIT)
                 break;
         }
 
-        showBoard();
     }
     return score;
 }
@@ -48,23 +54,24 @@ bool Game::renderElement()
     }
     else
     {
-        const auto freeTiles = grid.getFreeTiles();
+        const auto freeTiles = grid.getFreeTilesCoordinates();
         const auto N = freeTiles.size();
         const auto randomFreeTile = freeTiles[rand() % N];
         const auto newNumber = rand() % 4 <= 1 ? 2 : 4;
-        grid.setTile(randomFreeTile, number);
+        grid.setTile(randomFreeTile, newNumber);
         return true;
     }
 }
 
-void showBoard()
+void Game::showBoard()
 {
-    cv::imshow("2048", grid.getImage()); 
+    image = grid.getImage();
+    cv::imshow("2048", image); 
 }
 
-void updateGrid(KeyHandler::Key key)
+bool Game::updateGrid(KeyHandler::Key key)
 {
-
+    return grid.update(key);
 }
 
 void Game::showLoseScreen()
@@ -72,7 +79,36 @@ void Game::showLoseScreen()
 
 }
 
-Game::WinDecision Game::showWinScreen()
+WinScreen::WinDecision Game::showWinScreen()
 {
-    return Game::WinDecision::QUIT;
+    image = grid.getImage();
+    const auto w = (image.cols - WinScreen::WIDTH)  / 2;
+    const auto h = (image.rows - WinScreen::HEIGHT) / 2;
+    auto dst = image(cv::Rect(w, h, WinScreen::WIDTH, WinScreen::HEIGHT));
+    WinScreen::get().getImage().copyTo(dst);
+    cv::imshow("2048", image);
+
+    return handleWinScreenKeys();
+}
+
+WinScreen::WinDecision Game::handleWinScreenKeys()
+{
+    int key {0};
+    while(key = cv::waitKey() & 0xFF)
+    {
+        if(key == KeyHandler::Key::ENTER)
+        {
+            return WinScreen::get().getWinDecision();
+        }
+        else if(key == KeyHandler::Key::LEFT)
+        {
+            WinScreen::get().setLeftOption();
+            cv::imshow("2048", image);
+        }
+        else if(key == KeyHandler::Key::RIGHT)
+        {
+            WinScreen::get().setRightOption();
+            cv::imshow("2048", image);
+        }
+    }
 }
