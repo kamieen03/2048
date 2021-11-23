@@ -20,6 +20,7 @@ private:
     bool updateGrid(KeyHandler::Key);
     void showLoseScreen();
     WinScreen::WinDecision showWinScreen();
+    void pasteWinScreen();
     WinScreen::WinDecision handleWinScreenKeys();
 
     cv::Mat image {Grid::IMAGE_SIZE, Grid::IMAGE_SIZE, CV_8UC3,CV_RGB(0,0,0)};

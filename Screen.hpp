@@ -1,4 +1,5 @@
 #include <opencv2/imgproc.hpp>
+#include <opencv2/core.hpp>
 #include <opencv2/core/mat.hpp>
 #include <string>
 
@@ -15,6 +16,7 @@ public:
     static constexpr int HEIGHT   {250};
     static constexpr int WIDTH    {500};
     static const cv::Scalar COLOR;
+    static const cv::Scalar OPTION_BACKGROUND;
 
     // font constants
     static constexpr int    FONT_FACE {cv::FONT_HERSHEY_DUPLEX};
@@ -35,15 +37,19 @@ public:
 
     WinDecision getWinDecision();
     cv::Mat& getImage() {return image;};
-    void setLeftOption() {flagLeftOption = true;};
-    void setRightOption() {flagLeftOption = false;};
+    void setLeftOption();
+    void setRightOption();
 
 private:
     cv::Mat image;
     bool flagLeftOption {true};
 
     WinScreen();
+    void addWinText(float fontScale);
+    void addContinueText(float fontScale);
+    void addQuitText(float fontScale);
     void addBorder();
-    cv::Size getTextSize(const std::string& text, float font_scale);
-    void addText(const std::string& text, const cv::Point& position, float font_scale);
+    void addOptionBackgroudRectangle(cv::Point p1, const cv::Size& size, bool option);
+    cv::Size getTextSize(const std::string& text, float fontScale);
+    void addText(const std::string& text, const cv::Point& position, float fontScale);
 };

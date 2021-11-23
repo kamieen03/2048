@@ -76,27 +76,12 @@ bool Grid::handleTile(Coordinate c, KeyHandler::Key key)
             break;
         }
         c = n;
-        printGrid();
     }
     return changed;
 }
 
-void Grid::printGrid() const
-{
-    for(int i = 0; i < 4; i++)
-    {
-        for(int k = 0; k < 4; k++)
-        {
-            std::cout << tiles[i][k].getValue() << " ";
-        }
-        std::cout << '\n';
-    }
-    std::cout << '\n';
-}
-
 bool Grid::update(KeyHandler::Key key)
 {
-    printGrid();
     bool changed = false;
     switch (key)
     {
@@ -136,7 +121,7 @@ bool Grid::has2048() const
 {
     for(int i = 0; i < 4; i++)
         for(int j = 0; j < 4; j++)
-            if(tiles[i][j].getValue() == 16)    //TODO
+            if(tiles[i][j].getValue() == 2048)
                 return true;
     return false;
 }
@@ -164,7 +149,6 @@ void Grid::setTile(const Coordinate& c, int value)
 {
     getTile(c).updateTile(value);
     refreshTileFace(c);
-    printGrid();
 }
 
 void Grid::refreshTileFace(const Coordinate& c)

@@ -76,19 +76,23 @@ bool Game::updateGrid(KeyHandler::Key key)
 
 void Game::showLoseScreen()
 {
-
+    //TODO
 }
 
 WinScreen::WinDecision Game::showWinScreen()
 {
     image = grid.getImage();
+    pasteWinScreen();
+    cv::imshow("2048", image);
+    return handleWinScreenKeys();
+}
+
+void Game::pasteWinScreen()
+{
     const auto w = (image.cols - WinScreen::WIDTH)  / 2;
     const auto h = (image.rows - WinScreen::HEIGHT) / 2;
     auto dst = image(cv::Rect(w, h, WinScreen::WIDTH, WinScreen::HEIGHT));
     WinScreen::get().getImage().copyTo(dst);
-    cv::imshow("2048", image);
-
-    return handleWinScreenKeys();
 }
 
 WinScreen::WinDecision Game::handleWinScreenKeys()
@@ -103,11 +107,13 @@ WinScreen::WinDecision Game::handleWinScreenKeys()
         else if(key == KeyHandler::Key::LEFT)
         {
             WinScreen::get().setLeftOption();
+            pasteWinScreen();
             cv::imshow("2048", image);
         }
         else if(key == KeyHandler::Key::RIGHT)
         {
             WinScreen::get().setRightOption();
+            pasteWinScreen();
             cv::imshow("2048", image);
         }
     }

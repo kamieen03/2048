@@ -2,32 +2,48 @@
 
 const cv::Scalar WinScreen::COLOR {CV_RGB(30,150,30)};
 const cv::Scalar WinScreen::FONT_COLOR {CV_RGB(0,0,0)};
+const cv::Scalar WinScreen::OPTION_BACKGROUND {CV_RGB(50,100,250)};
 
 WinScreen::WinScreen()
 {
     image = cv::Mat{HEIGHT, WIDTH, CV_8UC3, COLOR}; 
     addBorder();
 
-    const int big_font = 2;
-    const int small_font = 1;
+    const int bigFont = 2;
+    const int smallFont = 1;
 
-    const std::string win_s {"You win!"};
-    const auto win_size = getTextSize(win_s, big_font);
-    const auto win_position = cv::Point(
-            (WIDTH - win_size.width) / 2, (HEIGHT + win_size.height) / 3);
-    addText(win_s, win_position, big_font); 
+    addWinText(bigFont);
+    addContinueText(smallFont);
+    addQuitText(smallFont);
+}
 
-    const std::string continue_s {"Continue"};
-    const auto continue_size = getTextSize(continue_s, small_font);
-    const auto continue_position = cv::Point(
-            (WIDTH - continue_size.width) / 4, (HEIGHT + continue_size.height) * 2/3);
-    addText(continue_s, continue_position, small_font); 
+void WinScreen::addWinText(float fontScale)
+{
+    const std::string text {"You win!"};
+    const auto size = getTextSize(text, fontScale);
+    const auto pos = cv::Point(
+            (WIDTH - size.width) / 2, (HEIGHT + size.height) / 3);
+    addText(text, pos, fontScale); 
+}
 
-    const std::string quit_s {"Quit"};
-    const auto quit_size = getTextSize(quit_s, small_font);
-    const auto quit_position = cv::Point(
-            (WIDTH - quit_size.width) * 3/4, (HEIGHT + quit_size.height) * 2/3);
-    addText(quit_s, quit_position, small_font); 
+void WinScreen::addContinueText(float fontScale)
+{
+    const std::string text {"Continue"};
+    const auto size = getTextSize(text, fontScale);
+    const auto pos = cv::Point(
+            (WIDTH - size.width) / 4, (HEIGHT + size.height) * 2/3);
+    addOptionBackgroudRectangle(pos, size, flagLeftOption);
+    addText(text, pos, fontScale); 
+}
+
+void WinScreen::addQuitText(float fontScale)
+{
+    const std::string text {"Quit"};
+    const auto size = getTextSize(text, fontScale);
+    const auto pos = cv::Point(
+            (WIDTH - size.width) * 3/4, (HEIGHT + size.height) * 2/3);
+    addOptionBackgroudRectangle(pos, size, !flagLeftOption);
+    addText(text, pos, fontScale); 
 }
 
 void WinScreen::addBorder()
@@ -39,20 +55,42 @@ void WinScreen::addBorder()
                   10); //thickness
 }
 
-cv::Size WinScreen::getTextSize(const std::string& text, float font_scale)
+void WinScreen::addOptionBackgroudRectangle(cv::Point p1, const cv::Size& size, bool option)
+{
+    const auto color = option ? OPTION_BACKGROUND : COLOR;
+    const auto p2 = p1 + cv::Point(size.width+6, -size.height-6);
+    p1 += cv::Point(-6,6);
+    cv::rectangle(image, p1, p2, color, cv::FILLED);
+}
+
+cv::Size WinScreen::getTextSize(const std::string& text, float fontScale)
 {
     int baseline {0};
     return cv::getTextSize(text,
-                           FONT_FACE, font_scale, FONT_THICKNESS,
+                           FONT_FACE, fontScale, FONT_THICKNESS,
                            &baseline);
 }
 
-void WinScreen::addText(const std::string& text, const cv::Point& position, float font_scale)
+void WinScreen::addText(const std::string& text, const cv::Point& position, float fontScale)
 {
     cv::putText(image,
                 text,
                 position,
-                FONT_FACE, font_scale, FONT_COLOR, FONT_THICKNESS * font_scale);
+                FONT_FACE, fontScale, FONT_COLOR, FONT_THICKNESS * fontScale);
+}
+
+void WinScreen::setLeftOption()
+{
+    flagLeftOption = true;
+    addContinueText(1);
+    addQuitText(1);
+}
+
+void WinScreen::setRightOption()
+{
+    flagLeftOption = false;
+    addContinueText(1);
+    addQuitText(1);
 }
 
 WinScreen::WinDecision WinScreen::getWinDecision()
