@@ -4,7 +4,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include "Grid.hpp"
-#include "Screen.hpp"
+#include "InfoScreen.hpp"
 #include "KeyHandler.hpp"
 
 class Game
@@ -14,14 +14,14 @@ public:
     int run();
 
 private:
-
-    bool renderElement();
+    void renderElement();
     void showBoard();
     bool updateGrid(KeyHandler::Key);
-    void showLoseScreen();
     WinScreen::WinDecision showWinScreen();
-    void pasteWinScreen();
+    void showLoseScreen();
+    void pasteInfoScreen(InfoScreen& s);
     WinScreen::WinDecision handleWinScreenKeys();
+    void handleLoseScreenKeys();
 
     cv::Mat image {Grid::IMAGE_SIZE, Grid::IMAGE_SIZE, CV_8UC3,CV_RGB(0,0,0)};
     bool achieved2048 {false};

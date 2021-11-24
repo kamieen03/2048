@@ -20,7 +20,7 @@ Grid::Grid()
             refreshTileFace(std::make_pair(i,j));
 }
 
-std::optional<Coordinate> Grid::nextCoordinate(const Coordinate& c, KeyHandler::Key key)
+std::optional<Coordinate> Grid::nextCoordinate(const Coordinate& c, KeyHandler::Key key) const
 {
     Coordinate next;
     switch (key)
@@ -133,6 +133,31 @@ bool Grid::isFull() const
             if(tiles[i][j].getValue() == 0)
                 return false;
     return true;
+}
+
+bool Grid::canMove()
+{
+    const std::array<Key, 4> moveKeys {Key::UP, Key::DOWN, Key::LEFT, Key::RIGHT};
+
+    Coordinate t;
+    std::optional<Coordinate> n;
+
+    for(int i = 0; i < 4; i++)
+    {
+        for(int k = 0; k < 4; k++)
+        {
+            for(const auto& key : moveKeys) 
+            {
+                t = coordinateGrid[i][k];
+                n = nextCoordinate(t, key);
+                if(n and getTile(t).getValue() == getTile(*n).getValue())
+                {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
 
 std::vector<Coordinate> Grid::getFreeTilesCoordinates() const

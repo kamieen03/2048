@@ -15,10 +15,14 @@ int Game::run()
     while(true)
     {
         // player loses the game
-        if(changed and !renderElement())    // using lazy evaluation
+        if(grid.isFull() and !grid.canMove())
         {
             showLoseScreen();
             break;
+        }
+        else if(!grid.isFull() and changed)
+        {
+            renderElement();
         }
         showBoard();
         
@@ -46,21 +50,13 @@ int Game::run()
     return score;
 }
 
-bool Game::renderElement()
+void Game::renderElement()
 {
-    if(grid.isFull())
-    {
-        return false;
-    }
-    else
-    {
-        const auto freeTiles = grid.getFreeTilesCoordinates();
-        const auto N = freeTiles.size();
-        const auto randomFreeTile = freeTiles[rand() % N];
-        const auto newNumber = rand() % 4 <= 1 ? 2 : 4;
-        grid.setTile(randomFreeTile, newNumber);
-        return true;
-    }
+    const auto freeTiles = grid.getFreeTilesCoordinates();
+    const auto N = freeTiles.size();
+    const auto randomFreeTile = freeTiles[rand() % N];
+    const auto newNumber = rand() % 4 <= 1 ? 2 : 4;
+    grid.setTile(randomFreeTile, newNumber);
 }
 
 void Game::showBoard()
@@ -76,23 +72,26 @@ bool Game::updateGrid(KeyHandler::Key key)
 
 void Game::showLoseScreen()
 {
-    //TODO
+    image = grid.getImage();  
+    pasteInfoScreen(LoseScreen::get());
+    cv::imshow("2048", image);
+    return handleLoseScreenKeys();
 }
 
 WinScreen::WinDecision Game::showWinScreen()
 {
     image = grid.getImage();
-    pasteWinScreen();
+    pasteInfoScreen(WinScreen::get());
     cv::imshow("2048", image);
     return handleWinScreenKeys();
 }
 
-void Game::pasteWinScreen()
+void Game::pasteInfoScreen(InfoScreen& s)
 {
-    const auto w = (image.cols - WinScreen::WIDTH)  / 2;
-    const auto h = (image.rows - WinScreen::HEIGHT) / 2;
-    auto dst = image(cv::Rect(w, h, WinScreen::WIDTH, WinScreen::HEIGHT));
-    WinScreen::get().getImage().copyTo(dst);
+    const auto w = (image.cols - s.WIDTH)  / 2;
+    const auto h = (image.rows - s.HEIGHT) / 2;
+    auto dst = image(cv::Rect(w, h, s.WIDTH, s.HEIGHT));
+    s.getImage().copyTo(dst);
 }
 
 WinScreen::WinDecision Game::handleWinScreenKeys()
@@ -107,14 +106,28 @@ WinScreen::WinDecision Game::handleWinScreenKeys()
         else if(key == KeyHandler::Key::LEFT)
         {
             WinScreen::get().setLeftOption();
-            pasteWinScreen();
+            pasteInfoScreen(WinScreen::get());
             cv::imshow("2048", image);
         }
         else if(key == KeyHandler::Key::RIGHT)
         {
             WinScreen::get().setRightOption();
-            pasteWinScreen();
+            pasteInfoScreen(WinScreen::get());
             cv::imshow("2048", image);
         }
     }
 }
+
+
+void Game::handleLoseScreenKeys()
+{
+    int key {0};
+    while(key = cv::waitKey() & 0xFF)
+    {
+        if(key == KeyHandler::Key::ENTER or key == KeyHandler::Key::QUIT)
+        {
+            return;
+        }
+    }
+}
+
