@@ -14,25 +14,26 @@ int Game::run()
     bool changed = true;
     while(true)
     {
+        if(!grid.isFull() and changed)
+        {
+            renderElement();
+        }
+        showBoard();
+
         // player loses the game
         if(grid.isFull() and !grid.canMove())
         {
             showLoseScreen();
             break;
         }
-        else if(!grid.isFull() and changed)
-        {
-            renderElement();
-        }
-        showBoard();
-        
+
         // player enters key (might want to quit)
         auto key = keyHandler();
         if(key == KeyHandler::Key::QUIT)
         {
             break;
         }
-        
+
         // game engine updates the board
         changed = updateGrid(key);
         showBoard();
@@ -62,7 +63,7 @@ void Game::renderElement()
 void Game::showBoard()
 {
     image = grid.getImage();
-    cv::imshow("2048", image); 
+    cv::imshow("2048", image);
 }
 
 bool Game::updateGrid(KeyHandler::Key key)
@@ -72,7 +73,7 @@ bool Game::updateGrid(KeyHandler::Key key)
 
 void Game::showLoseScreen()
 {
-    image = grid.getImage();  
+    image = grid.getImage();
     pasteInfoScreen(LoseScreen::get());
     cv::imshow("2048", image);
     return handleLoseScreenKeys();
