@@ -1,8 +1,6 @@
 #include "Grid.hpp"
 #include <iostream>
 
-const cv::Scalar Grid::backgroundColor {CV_RGB(180,0,40)};
-
 const std::array<std::array<Coordinate,4>,4> Grid::coordinateGrid = []
 {
     std::array<std::array<Coordinate,4>,4> cg;
@@ -13,11 +11,10 @@ const std::array<std::array<Coordinate,4>,4> Grid::coordinateGrid = []
 }();
 
 
-Grid::Grid()
+Grid::Grid(const ColorScheme& cs)
 {
-    for(int i = 0; i < 4; i++)
-        for(int j = 0; j < 4; j++)
-            refreshTileFace(std::make_pair(i,j));
+    updateColorScheme(cs);
+    refreshImage();
 }
 
 std::optional<Coordinate> Grid::nextCoordinate(const Coordinate& c, KeyHandler::Key key) const
@@ -182,5 +179,14 @@ void Grid::refreshTileFace(const Coordinate& c)
     const auto& size = Tile::TILE_SIZE;
     auto dst = gridImage(cv::Rect(size*k+10*(k+1), size*i+10*(i+1), size, size));
     tiles[i][k].getFace().copyTo(dst);
+}
+
+void Grid::updateColorScheme(const ColorScheme& cs)
+{
+    const auto backgroundColor = cs.getBackgroundColor();
+    gridImage = cv::Mat{IMAGE_SIZE, IMAGE_SIZE, CV_8UC3, backgroundColor};
+    for(int i = 0; i < 4; i++)
+        for(int k = 0; k < 4; k++)
+           getTile(coordinateGrid[i][k]).updateColorScheme(cs);
 }
 

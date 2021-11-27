@@ -131,3 +131,9 @@ void Game::handleLoseScreenKeys()
     }
 }
 
+
+void Game::updateColorScheme(const ColorScheme& cs)
+{
+    grid.updateColorScheme(cs);
+}
+

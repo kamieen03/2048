@@ -70,7 +70,7 @@ cv::Scalar ColorSchemeBuilder::stringToColor(const std::string& s)
 bool ColorSchemeReader::cached = false;
 std::vector<ColorScheme> ColorSchemeReader::schemes {};
 
-std::vector<ColorScheme> ColorSchemeReader::getSchemes()
+std::vector<ColorScheme>& ColorSchemeReader::getSchemes()
 {
     if(cached)
     {

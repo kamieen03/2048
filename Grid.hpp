@@ -7,6 +7,7 @@
 
 #include "Tile.hpp"
 #include "KeyHandler.hpp"
+#include "ColorSchemeReader.hpp"
 
 using Coordinate = std::pair<int,int>;
 using Key = KeyHandler::Key;
@@ -14,7 +15,7 @@ using Key = KeyHandler::Key;
 class Grid
 {
 public:
-    Grid();
+    Grid(const ColorScheme& cs);
     bool has2048() const;
     bool isFull() const;
     bool canMove();
@@ -22,6 +23,7 @@ public:
     std::vector<Coordinate> getFreeTilesCoordinates() const;
     bool update(KeyHandler::Key key);
     void setTile(const Coordinate& c, int value);
+    void updateColorScheme(const ColorScheme& cs);
 
     static constexpr int IMAGE_SIZE = 4 * Tile::TILE_SIZE + 50;
 
@@ -34,8 +36,7 @@ private:
     void printGrid() const;
 
     std::array<std::array<Tile,4>,4> tiles;
-    static const cv::Scalar backgroundColor;
     static const std::array<std::array<Coordinate,4>,4> coordinateGrid;
-    cv::Mat gridImage {IMAGE_SIZE, IMAGE_SIZE, CV_8UC3, backgroundColor};
+    cv::Mat gridImage {IMAGE_SIZE, IMAGE_SIZE, CV_8UC3, CV_RGB(0,0,0)};
 };
 

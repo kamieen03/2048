@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -14,6 +16,9 @@ public:
                 const cv::Scalar& backgroundColor,
                 const std::string& name);
     friend std::ostream& operator<<(std::ostream& os, const ColorScheme& cs);
+    cv::Scalar getBackgroundColor() const {return backgroundColor;}
+    cv::Scalar getEmptyTileColor() const {return emptyTileColor;}
+    auto getTileColors() const {return tileColors;}
 
 private:
     std::map<int, cv::Scalar> tileColors;
@@ -43,7 +48,7 @@ private:
 class ColorSchemeReader
 {
 public:
-    static std::vector<ColorScheme> getSchemes();
+    static std::vector<ColorScheme>& getSchemes();
 private:
     static std::vector<ColorScheme> schemes;
     static bool cached;
