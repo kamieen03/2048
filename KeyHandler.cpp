@@ -1,6 +1,6 @@
 #include "KeyHandler.hpp"
 
-KeyHandler::Key KeyHandler::operator()()
+KeyHandler::Key KeyHandler::handle() const
 {
     int key = 0;
     while(!validInGameKey(key))
@@ -8,7 +8,7 @@ KeyHandler::Key KeyHandler::operator()()
     return KeyHandler::Key(key);
 }
 
-bool KeyHandler::validInGameKey(int key)
+bool KeyHandler::validInGameKey(int key) const
 {
     static constexpr std::array<Key, 5> validKeys
     {

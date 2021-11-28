@@ -29,6 +29,5 @@ private:
     bool achieved2048 {false};
     int score {0};
     Grid grid {ColorSchemeReader::getSchemes()[0]};
-    KeyHandler keyHandler {};
 };
 

@@ -28,7 +28,7 @@ int Game::run()
         }
 
         // player enters key (might want to quit)
-        auto key = keyHandler();
+        auto key = KeyHandler::get().handle();
         if(key == KeyHandler::Key::QUIT)
         {
             break;

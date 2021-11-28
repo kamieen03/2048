@@ -16,8 +16,13 @@ public:
         QUIT = 27,
         ENTER = 13
     };
-    KeyHandler::Key operator()();
+    KeyHandler::Key handle() const;
+    static KeyHandler& get()
+    {
+        static KeyHandler kh;
+        return kh;
+    }
 
 private:
-    bool validInGameKey(int);
+    bool validInGameKey(int) const;
 };
