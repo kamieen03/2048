@@ -10,22 +10,22 @@ Grid::Grid(const ColorScheme& cs)
     refreshImage();
 }
 
-std::optional<Tile*> Grid::nextTile(const Tile& t, KeyHandler::Key key)
+std::optional<Tile*> Grid::nextTile(const Tile& t, Key key)
 {
     Coordinate next;
     const auto pos = t.getPosition();
     switch (key)
     {
-        case KeyHandler::Key::UP:
+        case Key::UP:
             next = std::make_pair(pos.first-1, pos.second);
             break;
-        case KeyHandler::Key::DOWN:
+        case Key::DOWN:
             next = std::make_pair(pos.first+1, pos.second);
             break;
-        case KeyHandler::Key::LEFT:
+        case Key::LEFT:
             next = std::make_pair(pos.first, pos.second-1);
             break;
-        case KeyHandler::Key::RIGHT:
+        case Key::RIGHT:
             next = std::make_pair(pos.first, pos.second+1);
             break;
     }
@@ -35,7 +35,7 @@ std::optional<Tile*> Grid::nextTile(const Tile& t, KeyHandler::Key key)
     return std::nullopt;
 }
 
-bool Grid::handleTile(Tile& t, KeyHandler::Key key)
+bool Grid::handleTile(Tile& t, Key key)
 {
     if(t.empty())
     {
@@ -71,27 +71,27 @@ bool Grid::handleTile(Tile& t, KeyHandler::Key key)
     return changed;
 }
 
-bool Grid::update(KeyHandler::Key key)
+bool Grid::update(Key key)
 {
     bool changed = false;
     switch (key)
     {
-        case KeyHandler::Key::UP:
+        case Key::UP:
             for(int i = 1; i < 4; i++)
                 for(int k = 0; k < 4; k++)
                     changed |= handleTile(tiles[i][k], key);
             break;
-        case KeyHandler::Key::DOWN:
+        case Key::DOWN:
             for(int i = 2; i >= 0; i--)
                 for(int k = 0; k < 4; k++)
                     changed |= handleTile(tiles[i][k], key);
             break;
-        case KeyHandler::Key::LEFT:
+        case Key::LEFT:
             for(int k = 1; k < 4; k++)
                 for(int i = 0; i < 4; i++)
                     changed |= handleTile(tiles[i][k], key);
             break;
-        case KeyHandler::Key::RIGHT:
+        case Key::RIGHT:
             for(int k = 2; k >= 0; k--)
                 for(int i = 0; i < 4; i++)
                     changed |= handleTile(tiles[i][k], key);
