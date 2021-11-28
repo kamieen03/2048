@@ -1,78 +1,72 @@
 #include "Grid.hpp"
 #include <iostream>
 
-const std::array<std::array<Coordinate,4>,4> Grid::coordinateGrid = []
-{
-    std::array<std::array<Coordinate,4>,4> cg;
-    for(int i = 0; i < 4; i++)
-        for(int j = 0; j < 4; j++)
-            cg[i][j] = std::make_pair(i,j);
-    return cg;
-}();
-
-
 Grid::Grid(const ColorScheme& cs)
 {
+    for(int i = 0; i < 4; i++)
+        for(int k = 0; k < 4; k++)
+            tiles[i][k] = Tile(std::make_pair(i,k));
     updateColorScheme(cs);
     refreshImage();
 }
 
-std::optional<Coordinate> Grid::nextCoordinate(const Coordinate& c, KeyHandler::Key key) const
+std::optional<Tile*> Grid::nextTile(const Tile& t, KeyHandler::Key key)
 {
     Coordinate next;
+    const auto pos = t.getPosition();
     switch (key)
     {
         case KeyHandler::Key::UP:
-            next = std::make_pair(c.first-1, c.second);
+            next = std::make_pair(pos.first-1, pos.second);
             break;
         case KeyHandler::Key::DOWN:
-            next = std::make_pair(c.first+1, c.second);
+            next = std::make_pair(pos.first+1, pos.second);
             break;
         case KeyHandler::Key::LEFT:
-            next = std::make_pair(c.first, c.second-1);
+            next = std::make_pair(pos.first, pos.second-1);
             break;
         case KeyHandler::Key::RIGHT:
-            next = std::make_pair(c.first, c.second+1);
+            next = std::make_pair(pos.first, pos.second+1);
             break;
     }
 
     if(next.first >= 0 and next.first < 4 and next.second >= 0 and next.second < 4)
-        return next;
+        return &tiles[next.first][next.second];
     return std::nullopt;
 }
 
-bool Grid::handleTile(Coordinate c, KeyHandler::Key key)
+bool Grid::handleTile(Tile& t, KeyHandler::Key key)
 {
-    if(getTile(c).empty())
+    if(t.empty())
     {
         return false;
     }
 
-    std::optional<Coordinate> _n;
-    Coordinate n;
+    Tile* t1 = &t;
+    std::optional<Tile*> _t2;
+    Tile* t2;
     bool changed = false;
-    while(_n = nextCoordinate(c, key))
+    while(_t2 = nextTile(*t1, key))
     {
-        n = _n.value();
-        if(getTile(n).getValue() == getTile(c).getValue())
+        t2 = _t2.value();
+        if(t2->getValue() == t1->getValue())
         {
-            getTile(n).doubleTile();
-            getTile(c).updateTile(0);
+            t2->doubleTile();
+            t1->updateTile(0);
             changed = true;          //at most one fusion of one tile
             break;
         }
-        else if(getTile(n).empty())
+        else if(t2->empty())
         {
-            getTile(n).updateTile(getTile(c).getValue());
-            getTile(c).updateTile(0);
+            t2->updateTile(t1->getValue());
+            t1->updateTile(0);
             changed = true;
         }
         else
         {
-            changed |= false;
             break;
         }
-        c = n;
+        t1 = t2;
     }
     return changed;
 }
@@ -85,22 +79,22 @@ bool Grid::update(KeyHandler::Key key)
         case KeyHandler::Key::UP:
             for(int i = 1; i < 4; i++)
                 for(int k = 0; k < 4; k++)
-                    changed |= handleTile(coordinateGrid[i][k], key);
+                    changed |= handleTile(tiles[i][k], key);
             break;
         case KeyHandler::Key::DOWN:
             for(int i = 2; i >= 0; i--)
                 for(int k = 0; k < 4; k++)
-                    changed |= handleTile(coordinateGrid[i][k], key);
+                    changed |= handleTile(tiles[i][k], key);
             break;
         case KeyHandler::Key::LEFT:
             for(int k = 1; k < 4; k++)
                 for(int i = 0; i < 4; i++)
-                    changed |= handleTile(coordinateGrid[i][k], key);
+                    changed |= handleTile(tiles[i][k], key);
             break;
         case KeyHandler::Key::RIGHT:
             for(int k = 2; k >= 0; k--)
                 for(int i = 0; i < 4; i++)
-                    changed |= handleTile(coordinateGrid[i][k], key);
+                    changed |= handleTile(tiles[i][k], key);
             break;
     }
     refreshImage();
@@ -110,15 +104,15 @@ bool Grid::update(KeyHandler::Key key)
 void Grid::refreshImage()
 {
     for(int i = 0; i < 4; i++)
-        for(int j = 0; j < 4; j++)
-            refreshTileFace(coordinateGrid[i][j]);
+        for(int k = 0; k < 4; k++)
+            refreshTileFace(tiles[i][k]);
 }
 
 bool Grid::has2048() const
 {
     for(int i = 0; i < 4; i++)
-        for(int j = 0; j < 4; j++)
-            if(tiles[i][j].getValue() == 2048)
+        for(int k = 0; k < 4; k++)
+            if(tiles[i][k].getValue() == 2048)
                 return true;
     return false;
 }
@@ -126,8 +120,8 @@ bool Grid::has2048() const
 bool Grid::isFull() const
 {
     for(int i = 0; i < 4; i++)
-        for(int j = 0; j < 4; j++)
-            if(tiles[i][j].getValue() == 0)
+        for(int k = 0; k < 4; k++)
+            if(tiles[i][k].getValue() == 0)
                 return false;
     return true;
 }
@@ -136,18 +130,18 @@ bool Grid::canMove()
 {
     const std::array<Key, 4> moveKeys {Key::UP, Key::DOWN, Key::LEFT, Key::RIGHT};
 
-    Coordinate t;
-    std::optional<Coordinate> n;
+    Tile* t1;
+    std::optional<Tile*> t2;
 
     for(int i = 0; i < 4; i++)
     {
         for(int k = 0; k < 4; k++)
         {
-            for(const auto& key : moveKeys) 
+            t1 = &tiles[i][k];
+            for(const auto& key : moveKeys)
             {
-                t = coordinateGrid[i][k];
-                n = nextCoordinate(t, key);
-                if(n and getTile(t).getValue() == getTile(*n).getValue())
+                t2 = nextTile(*t1, key);
+                if(t2 and t1->getValue() == (*t2)->getValue())
                 {
                     return true;
                 }
@@ -157,28 +151,28 @@ bool Grid::canMove()
     return false;
 }
 
-std::vector<Coordinate> Grid::getFreeTilesCoordinates() const
+std::vector<Tile*> Grid::getFreeTiles()
 {
-    std::vector<Coordinate> freeTiles;
+    std::vector<Tile*> freeTiles;
     for(int i = 0; i < 4; i++)
-        for(int j = 0; j < 4; j++)
-            if(tiles[i][j].getValue() == 0)
-                freeTiles.push_back(std::make_pair(i,j));
+        for(int k = 0; k < 4; k++)
+            if(tiles[i][k].getValue() == 0)
+                freeTiles.push_back(&tiles[i][k]);
     return freeTiles;
 }
 
-void Grid::setTile(const Coordinate& c, int value)
+void Grid::setTile(Tile& t, int value)
 {
-    getTile(c).updateTile(value);
-    refreshTileFace(c);
+    t.updateTile(value);
+    refreshTileFace(t);
 }
 
-void Grid::refreshTileFace(const Coordinate& c)
+void Grid::refreshTileFace(Tile& t)
 {
-    const auto& [i, k] = c;
+    const auto& [i, k] = t.getPosition();
     const auto& size = Tile::TILE_SIZE;
     auto dst = gridImage(cv::Rect(size*k+10*(k+1), size*i+10*(i+1), size, size));
-    tiles[i][k].getFace().copyTo(dst);
+    t.getFace().copyTo(dst);
 }
 
 void Grid::updateColorScheme(const ColorScheme& cs)
@@ -187,6 +181,6 @@ void Grid::updateColorScheme(const ColorScheme& cs)
     gridImage = cv::Mat{IMAGE_SIZE, IMAGE_SIZE, CV_8UC3, backgroundColor};
     for(int i = 0; i < 4; i++)
         for(int k = 0; k < 4; k++)
-           getTile(coordinateGrid[i][k]).updateColorScheme(cs);
+           tiles[i][k].updateColorScheme(cs);
 }
 

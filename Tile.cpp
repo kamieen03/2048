@@ -4,6 +4,10 @@
 const cv::Scalar Tile::FONT_COLOR = CV_RGB(0,0,0);
 const ColorScheme* Tile::colorScheme {nullptr};
 
+Tile::Tile(Coordinate c):
+    position(c)
+{}
+
 void Tile::updateTile(int val)
 {
 

@@ -7,15 +7,20 @@
 
 #include "ColorSchemeReader.hpp"
 
+using Coordinate = std::pair<int,int>;
+
 class Tile
 {
 public:
+    Tile(){};
+    Tile(Coordinate c);
     void updateTile(int value);
     void doubleTile(){updateTile(value*2);};
     cv::Mat getFace() {return face;};
     int getValue() const {return value;};
     bool empty() const {return value == 0;};
     void updateColorScheme(const ColorScheme& cs);
+    Coordinate getPosition() const {return position;}
 
     static constexpr int TILE_SIZE {150};
 
@@ -30,7 +35,6 @@ private:
     static const ColorScheme* colorScheme;
 
     int value {0};
+    Coordinate position;
     cv::Mat face {TILE_SIZE, TILE_SIZE, CV_8UC3, CV_RGB(0,0,0)};
-
-
 };

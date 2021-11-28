@@ -53,11 +53,11 @@ int Game::run()
 
 void Game::renderElement()
 {
-    const auto freeTiles = grid.getFreeTilesCoordinates();
+    const auto freeTiles = grid.getFreeTiles();
     const auto N = freeTiles.size();
     const auto randomFreeTile = freeTiles[rand() % N];
     const auto newNumber = rand() % 4 <= 1 ? 2 : 4;
-    grid.setTile(randomFreeTile, newNumber);
+    grid.setTile(*randomFreeTile, newNumber);
 }
 
 void Game::showBoard()
