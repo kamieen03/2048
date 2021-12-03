@@ -2,6 +2,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/core/mat.hpp>
 #include <string>
+#include "CQDecision.hpp"
 
 
 class InfoScreen
@@ -27,12 +28,6 @@ protected:
 class WinScreen : public InfoScreen
 {
 public:
-    enum class WinDecision : int
-    {
-        CONTINUE,
-        QUIT
-    };
-
     // image constants
     const cv::Scalar COLOR {CV_RGB(30,150,30)};
     const cv::Scalar OPTION_BACKGROUND {CV_RGB(50,100,250)};
@@ -49,7 +44,7 @@ public:
         return s;
     }
     cv::Mat& getImage() {return image;};
-    WinDecision getWinDecision();
+    CQDecision getWinDecision();
     void setLeftOption();
     void setRightOption();
 

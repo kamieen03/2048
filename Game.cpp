@@ -43,7 +43,7 @@ int Game::run()
         {
             achieved2048 = true;
             const auto winDecision = showWinScreen();
-            if(winDecision == WinScreen::WinDecision::QUIT)
+            if(winDecision == CQDecision::QUIT)
                 break;
         }
 
@@ -79,7 +79,7 @@ void Game::showLoseScreen()
     return handleLoseScreenKeys();
 }
 
-WinScreen::WinDecision Game::showWinScreen()
+CQDecision Game::showWinScreen()
 {
     image = grid.getImage();
     pasteInfoScreen(WinScreen::get());
@@ -95,7 +95,7 @@ void Game::pasteInfoScreen(InfoScreen& s)
     s.getImage().copyTo(dst);
 }
 
-WinScreen::WinDecision Game::handleWinScreenKeys()
+CQDecision Game::handleWinScreenKeys()
 {
     int key {0};
     while(key = cv::waitKey() & 0xFF)

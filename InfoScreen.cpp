@@ -97,11 +97,11 @@ void WinScreen::setRightOption()
     addQuitText(1);
 }
 
-WinScreen::WinDecision WinScreen::getWinDecision()
+CQDecision WinScreen::getWinDecision()
 {
     if(flagLeftOption)
-        return WinDecision::CONTINUE;
-    return WinDecision::QUIT;
+        return CQDecision::CONTINUE;
+    return CQDecision::QUIT;
 }
 
 

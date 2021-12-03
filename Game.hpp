@@ -7,6 +7,7 @@
 #include "InfoScreen.hpp"
 #include "KeyHandler.hpp"
 #include "ColorSchemeReader.hpp"
+#include "CQDecision.hpp"
 
 class Game
 {
@@ -18,14 +19,14 @@ private:
     void renderElement();
     void showBoard();
     bool updateGrid(KeyHandler::Key);
-    WinScreen::WinDecision showWinScreen();
+    CQDecision showWinScreen();
     void showLoseScreen();
     void pasteInfoScreen(InfoScreen& s);
-    WinScreen::WinDecision handleWinScreenKeys();
+    CQDecision handleWinScreenKeys();
     void handleLoseScreenKeys();
     void updateColorScheme(const ColorScheme& cs);
 
-    cv::Mat image {Grid::IMAGE_SIZE, Grid::IMAGE_SIZE, CV_8UC3,CV_RGB(0,0,0)};
+    cv::Mat image {Grid::IMAGE_SIZE, Grid::IMAGE_SIZE, CV_8UC3, CV_RGB(0,0,0)};
     bool achieved2048 {false};
     int score {0};
     Grid grid {ColorSchemeReader::getSchemes()[0]};
