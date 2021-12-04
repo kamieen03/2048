@@ -7,7 +7,6 @@ Grid::Grid(const ColorScheme& cs)
         for(int k = 0; k < 4; k++)
             tiles[i][k] = Tile(std::make_pair(i,k));
     updateColorScheme(cs);
-    refreshImage();
 }
 
 std::optional<Tile*> Grid::nextTile(const Tile& t, Key key)
@@ -97,7 +96,10 @@ bool Grid::update(Key key)
                     changed |= handleTile(tiles[i][k], key);
             break;
     }
-    refreshImage();
+    if(changed)
+    {
+        refreshImage();
+    }
     return changed;
 }
 
@@ -182,5 +184,6 @@ void Grid::updateColorScheme(const ColorScheme& cs)
     for(int i = 0; i < 4; i++)
         for(int k = 0; k < 4; k++)
            tiles[i][k].updateColorScheme(cs);
+    refreshImage();
 }
 

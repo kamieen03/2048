@@ -31,7 +31,9 @@ int Game::run()
         auto key = KeyHandler::get().handle();
         if(key == KeyHandler::Key::QUIT)
         {
-            break;
+            const auto decision = showMenu();
+            if(decision == CQDecision::QUIT)
+                break;
         }
 
         // game engine updates the board
@@ -74,7 +76,7 @@ bool Game::updateGrid(KeyHandler::Key key)
 void Game::showLoseScreen()
 {
     image = grid.getImage();
-    pasteInfoScreen(LoseScreen::get());
+    pastePopUpScreen(LoseScreen::get().getImage());
     cv::imshow("2048", image);
     return handleLoseScreenKeys();
 }
@@ -82,17 +84,14 @@ void Game::showLoseScreen()
 CQDecision Game::showWinScreen()
 {
     image = grid.getImage();
-    pasteInfoScreen(WinScreen::get());
+    pastePopUpScreen(WinScreen::get().getImage());
     cv::imshow("2048", image);
     return handleWinScreenKeys();
 }
 
-void Game::pasteInfoScreen(InfoScreen& s)
+void Game::pastePopUpScreen(const cv::Mat& popUpScreen)
 {
-    const auto w = (image.cols - s.WIDTH)  / 2;
-    const auto h = (image.rows - s.HEIGHT) / 2;
-    auto dst = image(cv::Rect(w, h, s.WIDTH, s.HEIGHT));
-    s.getImage().copyTo(dst);
+    graphics::pasteRectangleOntoImageCentered(popUpScreen, image);
 }
 
 CQDecision Game::handleWinScreenKeys()
@@ -107,18 +106,15 @@ CQDecision Game::handleWinScreenKeys()
         else if(key == KeyHandler::Key::LEFT)
         {
             WinScreen::get().setLeftOption();
-            pasteInfoScreen(WinScreen::get());
-            cv::imshow("2048", image);
         }
         else if(key == KeyHandler::Key::RIGHT)
         {
             WinScreen::get().setRightOption();
-            pasteInfoScreen(WinScreen::get());
-            cv::imshow("2048", image);
         }
+        pastePopUpScreen(WinScreen::get().getImage());
+        cv::imshow("2048", image);
     }
 }
-
 
 void Game::handleLoseScreenKeys()
 {
@@ -132,9 +128,35 @@ void Game::handleLoseScreenKeys()
     }
 }
 
-
 void Game::updateColorScheme(const ColorScheme& cs)
 {
     grid.updateColorScheme(cs);
 }
 
+CQDecision Game::showMenu()
+{
+    image = grid.getImage();
+    pastePopUpScreen(menu.getImage());
+    cv::imshow("2048", image);
+    return handleMenuKeys();
+}
+
+CQDecision Game::handleMenuKeys()
+{
+    Key key;
+    while(key = Key(cv::waitKey() & 0xFF))
+    {
+        const auto menuSignalSet = menu.handleKey(key);
+        if(menuSignalSet.changedColorScheme)
+        {
+            updateColorScheme(menu.getActiveScheme());
+            image = grid.getImage();
+        }
+        else if(menuSignalSet.cqDecision)
+        {
+            return *menuSignalSet.cqDecision;
+        }
+        pastePopUpScreen(menu.getImage());
+        cv::imshow("2048", image);
+    }
+}

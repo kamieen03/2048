@@ -18,6 +18,7 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const ColorScheme& cs);
     cv::Scalar getBackgroundColor() const {return backgroundColor;}
     cv::Scalar getEmptyTileColor() const {return emptyTileColor;}
+    std::string getName() const {return name;}
     auto getTileColors() const {return tileColors;}
 
 private:
