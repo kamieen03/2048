@@ -28,6 +28,15 @@ namespace graphics
         return img;
     }
 
+    cv::Mat getColoredRectangleWithCenteredText(cv::Scalar color,
+                                                const std::string& text,
+                                                float fontScale)
+    {
+        const auto size = getTextSize(text, fontScale);
+        return getColoredRectangleWithCenteredText(
+                size.height+12, size.width+12, color, text, fontScale);
+    }
+
     void addBorder(cv::Mat& image, cv::Scalar borderColor)
     {
         cv::rectangle(image,

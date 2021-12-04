@@ -10,7 +10,8 @@ include_directories( inc ${OpenCV_INCLUDE_DIRS} )
 add_executable(2048 src/graphics.cpp
                     src/Menu.cpp
                     src/ColorSchemeReader.cpp
-                    src/InfoScreen.cpp
+                    src/WinScreen.cpp
+                    src/LoseScreen.cpp
                     src/Tile.cpp
                     src/Grid.cpp
                     src/Game.cpp

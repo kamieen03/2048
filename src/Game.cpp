@@ -84,9 +84,10 @@ void Game::showLoseScreen()
 CQDecision Game::showWinScreen()
 {
     image = grid.getImage();
-    pastePopUpScreen(WinScreen::get().getImage());
+    WinScreen ws;
+    pastePopUpScreen(ws.getImage());
     cv::imshow("2048", image);
-    return handleWinScreenKeys();
+    return handleWinScreenKeys(ws);
 }
 
 void Game::pastePopUpScreen(const cv::Mat& popUpScreen)
@@ -94,24 +95,24 @@ void Game::pastePopUpScreen(const cv::Mat& popUpScreen)
     graphics::pasteRectangleOntoImageCentered(popUpScreen, image);
 }
 
-CQDecision Game::handleWinScreenKeys()
+CQDecision Game::handleWinScreenKeys(WinScreen& ws)
 {
     int key {0};
     while(key = cv::waitKey() & 0xFF)
     {
         if(key == KeyHandler::Key::ENTER)
         {
-            return WinScreen::get().getWinDecision();
+            return ws.getWinDecision();
         }
         else if(key == KeyHandler::Key::LEFT)
         {
-            WinScreen::get().setLeftOption();
+            ws.setLeftOption();
         }
         else if(key == KeyHandler::Key::RIGHT)
         {
-            WinScreen::get().setRightOption();
+            ws.setRightOption();
         }
-        pastePopUpScreen(WinScreen::get().getImage());
+        pastePopUpScreen(ws.getImage());
         cv::imshow("2048", image);
     }
 }

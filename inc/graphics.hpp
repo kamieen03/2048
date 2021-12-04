@@ -17,6 +17,9 @@ namespace graphics
                                                 cv::Scalar color,
                                                 const std::string& text,
                                                 float fontScale = 1.0);
+    cv::Mat getColoredRectangleWithCenteredText(cv::Scalar color,
+                                                const std::string& text,
+                                                float fontScale = 1.0);
     void addBorder(cv::Mat& image, cv::Scalar borderColor = BORDER_COLOR);
     void pasteRectangleOntoImage(const cv::Mat& rectangle,
                                  cv::Mat& image,

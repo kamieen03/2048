@@ -4,7 +4,8 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include "Grid.hpp"
-#include "InfoScreen.hpp"
+#include "WinScreen.hpp"
+#include "LoseScreen.hpp"
 #include "KeyHandler.hpp"
 #include "ColorSchemeReader.hpp"
 #include "CQDecision.hpp"
@@ -24,7 +25,7 @@ private:
     CQDecision showWinScreen();
     void showLoseScreen();
     void pastePopUpScreen(const cv::Mat& popUpScreen);
-    CQDecision handleWinScreenKeys();
+    CQDecision handleWinScreenKeys(WinScreen& ws);
     void handleLoseScreenKeys();
     void updateColorScheme(const ColorScheme& cs);
     CQDecision showMenu();
