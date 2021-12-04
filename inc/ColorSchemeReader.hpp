@@ -21,6 +21,24 @@ public:
     std::string getName() const {return name;}
     auto getTileColors() const {return tileColors;}
 
+    class Builder
+    {
+    public:
+        void setNextTileColor(const std::string& s);
+        void setEmptyTileColor(const std::string& s);
+        void setBackgroundColor(const std::string& s);
+        void setName(const std::string& s);
+        ColorScheme build();
+
+    private:
+        cv::Scalar stringToColor(const std::string& s);
+
+        std::map<int, cv::Scalar> tileColors;
+        cv::Scalar emptyTileColor;
+        cv::Scalar backgroundColor;
+        std::string name;
+    };
+
 private:
     std::map<int, cv::Scalar> tileColors;
     const cv::Scalar emptyTileColor;
@@ -28,29 +46,8 @@ private:
     const std::string name;
 };
 
-class ColorSchemeBuilder
+
+namespace ColorSchemeReader
 {
-public:
-    void setNextTileColor(const std::string& s);
-    void setEmptyTileColor(const std::string& s);
-    void setBackgroundColor(const std::string& s);
-    void setName(const std::string& s);
-    ColorScheme build();
-
-private:
-    cv::Scalar stringToColor(const std::string& s);
-
-    std::map<int, cv::Scalar> tileColors;
-    cv::Scalar emptyTileColor;
-    cv::Scalar backgroundColor;
-    std::string name;
-};
-
-class ColorSchemeReader
-{
-public:
-    static std::vector<ColorScheme>& getSchemes();
-private:
-    static std::vector<ColorScheme> schemes;
-    static bool cached;
+    std::vector<ColorScheme>& getSchemes();
 };

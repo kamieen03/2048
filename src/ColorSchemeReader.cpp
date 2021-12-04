@@ -29,7 +29,8 @@ std::ostream& operator<<(std::ostream& os, const ColorScheme& cs)
 
 
 
-void ColorSchemeBuilder::setNextTileColor(const std::string& s)
+
+void ColorScheme::Builder::setNextTileColor(const std::string& s)
 {
     const auto colonIdx = s.find(':');
     const int value = std::stoi(s.substr(0, colonIdx));
@@ -37,27 +38,27 @@ void ColorSchemeBuilder::setNextTileColor(const std::string& s)
     tileColors[value] = color;
 }
 
-void ColorSchemeBuilder::setEmptyTileColor(const std::string& s)
+void ColorScheme::Builder::setEmptyTileColor(const std::string& s)
 {
     emptyTileColor = stringToColor(s);
 }
 
-void ColorSchemeBuilder::setBackgroundColor(const std::string& s)
+void ColorScheme::Builder::setBackgroundColor(const std::string& s)
 {
     backgroundColor = stringToColor(s);
 }
 
-void ColorSchemeBuilder::setName(const std::string& name)
+void ColorScheme::Builder::setName(const std::string& name)
 {
     this->name = name;
 }
 
-ColorScheme ColorSchemeBuilder::build()
+ColorScheme ColorScheme::Builder::build()
 {
     return ColorScheme(tileColors, emptyTileColor, backgroundColor, name);
 }
 
-cv::Scalar ColorSchemeBuilder::stringToColor(const std::string& s)
+cv::Scalar ColorScheme::Builder::stringToColor(const std::string& s)
 {
     const auto firstComa = s.find(',');
     const auto secondComa = s.rfind(',');
@@ -67,55 +68,61 @@ cv::Scalar ColorSchemeBuilder::stringToColor(const std::string& s)
     return CV_RGB(r,g,b);
 }
 
-bool ColorSchemeReader::cached = false;
-std::vector<ColorScheme> ColorSchemeReader::schemes {};
 
-std::vector<ColorScheme>& ColorSchemeReader::getSchemes()
+
+
+
+namespace ColorSchemeReader
 {
-    if(cached)
+    static bool cached = false;
+    static std::vector<ColorScheme> schemes;
+
+    std::vector<ColorScheme>& getSchemes()
     {
+        if(cached)
+        {
+            return schemes;
+        }
+        std::ifstream file("/home/kamil/Pulpit/2048/color_schemes.co");
+        ColorScheme::Builder csb;
+        int settingTiles{0};
+        bool settingEmptyTile{false}, settingBackground{false};
+        for(std::string s; std::getline(file,s); )
+        {
+            if(s.find("THEME") != std::string::npos)
+            {
+                csb.setName(s.substr(6));
+            }
+            else if(s == "TILES")
+            {
+                settingTiles = 11;
+            }
+            else if(settingTiles > 0)
+            {
+                settingTiles--;
+                csb.setNextTileColor(s);
+            }
+            else if(s == "EMPTY TILE")
+            {
+                settingEmptyTile = true;
+            }
+            else if(settingEmptyTile)
+            {
+                settingEmptyTile = false;
+                csb.setEmptyTileColor(s);
+            }
+            else if(s == "BACKGROUND")
+            {
+                settingBackground = true;
+            }
+            else if(settingBackground)
+            {
+                settingBackground = false;
+                csb.setBackgroundColor(s);
+                schemes.push_back(csb.build());
+            }
+        }
+        cached = true;
         return schemes;
     }
-    std::ifstream file("/home/kamil/Pulpit/2048/color_schemes.co");
-    ColorSchemeBuilder csb;
-    int settingTiles{0};
-    bool settingEmptyTile{false}, settingBackground{false};
-    for(std::string s; std::getline(file,s); )
-    {
-        if(s.find("THEME") != std::string::npos)
-        {
-            csb.setName(s.substr(6));
-        }
-        else if(s == "TILES")
-        {
-            settingTiles = 11;
-        }
-        else if(settingTiles > 0)
-        {
-            settingTiles--;
-            csb.setNextTileColor(s);
-        }
-        else if(s == "EMPTY TILE")
-        {
-            settingEmptyTile = true;
-        }
-        else if(settingEmptyTile)
-        {
-            settingEmptyTile = false;
-            csb.setEmptyTileColor(s);
-        }
-        else if(s == "BACKGROUND")
-        {
-            settingBackground = true;
-        }
-        else if(settingBackground)
-        {
-            settingBackground = false;
-            csb.setBackgroundColor(s);
-            schemes.push_back(csb.build());
-        }
-    }
-    cached = true;
-    return schemes;
 }
-
