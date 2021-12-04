@@ -130,6 +130,11 @@ bool Grid::isFull() const
 
 bool Grid::canMove()
 {
+    if(!isFull())
+    {
+        return true;
+    }
+
     const std::array<Key, 4> moveKeys {Key::UP, Key::DOWN, Key::LEFT, Key::RIGHT};
 
     Tile* t1;

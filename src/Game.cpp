@@ -21,7 +21,7 @@ int Game::run()
         showBoard();
 
         // player loses the game
-        if(grid.isFull() and !grid.canMove())
+        if(!grid.canMove())
         {
             showLoseScreen();
             break;
