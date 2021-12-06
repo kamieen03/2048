@@ -35,6 +35,14 @@ int Game::run()
             if(decision == CQDecision::QUIT)
                 break;
         }
+        else if(key == KeyHandler::Key::BACK)
+        {
+            undoMove();
+        }
+        else
+        {
+            saveState();
+        }
 
         // game engine updates the board
         changed = updateGrid(key);
@@ -131,6 +139,7 @@ void Game::handleLoseScreenKeys()
 
 void Game::updateColorScheme(const ColorScheme& cs)
 {
+    currentColorScheme = &cs;
     grid.updateColorScheme(cs);
 }
 
@@ -161,3 +170,28 @@ CQDecision Game::handleMenuKeys()
         cv::imshow("2048", image);
     }
 }
+
+void Game::saveState()
+{
+   GameState gs {grid, achieved2048};
+   stateHistory.save(gs);
+}
+
+void Game::undoMove()
+{
+    const auto optGs = stateHistory.restore();
+    if(optGs)
+    {
+        // restored state is the same as the current stata, so we restore
+        // another one
+        if(optGs->grid == grid and optGs->achieved2048 == achieved2048)
+        {
+            undoMove();
+            return;
+        }
+        grid = optGs->grid;
+        achieved2048 = optGs->achieved2048;
+        updateColorScheme(*currentColorScheme);
+    }
+}
+

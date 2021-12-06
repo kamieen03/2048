@@ -7,7 +7,8 @@ set(COMPILE_FLAGS -Wall -Weffc++ -Wextra -Wsign-conversion -pedantic-errors)
 cmake_minimum_required(VERSION 3.13)
 find_package( OpenCV REQUIRED )
 include_directories( inc ${OpenCV_INCLUDE_DIRS} )
-add_executable(2048 src/graphics.cpp
+add_executable(2048 src/GameState.cpp
+                    src/graphics.cpp
                     src/Menu.cpp
                     src/ColorSchemeReader.cpp
                     src/WinScreen.cpp

@@ -11,6 +11,7 @@
 #include "CQDecision.hpp"
 #include "Menu.hpp"
 #include "graphics.hpp"
+#include "GameState.hpp"
 
 class Game
 {
@@ -30,13 +31,17 @@ private:
     void updateColorScheme(const ColorScheme& cs);
     CQDecision showMenu();
     CQDecision handleMenuKeys();
+    void saveState();
+    void undoMove();
 
 
     cv::Mat image {Grid::IMAGE_SIZE, Grid::IMAGE_SIZE, CV_8UC3, CV_RGB(0,0,0)};
     bool achieved2048 {false};
     int score {0};
     const std::vector<ColorScheme>& colorSchemes = ColorSchemeReader::getSchemes();
-    Grid grid {colorSchemes[0]};
+    const ColorScheme* currentColorScheme = &colorSchemes[0];
+    Grid grid {*currentColorScheme};
     Menu menu {colorSchemes};
+    GameStateHistory stateHistory;
 };
 

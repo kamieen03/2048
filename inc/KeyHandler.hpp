@@ -14,7 +14,8 @@ public:
         DOWN = 115,
         RIGHT = 100,
         QUIT = 27,
-        ENTER = 13
+        ENTER = 13,
+        BACK = 98
     };
     KeyHandler::Key handle() const;
     static KeyHandler& get()

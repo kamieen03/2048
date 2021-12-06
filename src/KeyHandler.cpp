@@ -10,9 +10,9 @@ KeyHandler::Key KeyHandler::handle() const
 
 bool KeyHandler::validInGameKey(int key) const
 {
-    static constexpr std::array<Key, 5> validKeys
+    static constexpr std::array<Key, 6> validKeys
     {
-        Key::UP, Key::DOWN, Key::LEFT, Key::RIGHT, Key::QUIT
+        Key::UP, Key::DOWN, Key::LEFT, Key::RIGHT, Key::QUIT, Key::BACK
     };
     return std::any_of(validKeys.begin(),
                        validKeys.end(),

@@ -9,6 +9,19 @@ Grid::Grid(const ColorScheme& cs)
     updateColorScheme(cs);
 }
 
+std::ostream& operator<<(std::ostream& os, const Grid& g)
+{
+    for(int i = 0; i < 4; i++)
+    {
+        for(int k = 0; k < 4; k++)
+        {
+            os << g.tiles[i][k].getValue() << " ";
+        }
+        os << '\n';
+    }
+    return os;
+}
+
 void Grid::updateColorScheme(const ColorScheme& cs)
 {
     const auto backgroundColor = cs.getBackgroundColor();
@@ -188,5 +201,14 @@ std::vector<Tile*> Grid::getFreeTiles()
             if(tiles[i][k].getValue() == 0)
                 freeTiles.push_back(&tiles[i][k]);
     return freeTiles;
+}
+
+bool operator==(const Grid& g1, const Grid& g2)
+{
+    for(int i = 0; i < 4; i++)
+        for(int k = 0; k < 4; k++)
+            if(g1.tiles[i][k].getValue() != g2.tiles[i][k].getValue())
+                return false;
+    return true;
 }
 
