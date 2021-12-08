@@ -71,9 +71,11 @@ private:
         static constexpr int HEIGHT {500};
         static constexpr int WIDTH  {300};
         static const cv::Scalar COLOR;
+        static const cv::Scalar FRAME_COLOR;
         static constexpr int BOX_HEIGHT {70};
         static constexpr int BOX_WIDTH  {WIDTH*2/3};
         static const cv::Scalar BOX_COLOR;
+        static const cv::Scalar BOX_FRAME_COLOR;
 
     private:
         void drawOptionBox(const std::string& text, int distanceFromTheTop, bool highlight);

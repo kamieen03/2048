@@ -109,8 +109,10 @@ void Menu::draw()
 
 
 
-const cv::Scalar Menu::MenuDrawer::COLOR = CV_RGB(100,200,100);
-const cv::Scalar Menu::MenuDrawer::BOX_COLOR = CV_RGB(100,20,20);
+const cv::Scalar Menu::MenuDrawer::COLOR = CV_RGB(198, 218, 191);
+const cv::Scalar Menu::MenuDrawer::BOX_COLOR = CV_RGB(136, 212, 152);
+const cv::Scalar Menu::MenuDrawer::FRAME_COLOR = CV_RGB(17, 75, 95);
+const cv::Scalar Menu::MenuDrawer::BOX_FRAME_COLOR = CV_RGB(26, 147, 111);
 
 void Menu::MenuDrawer::draw(const std::map<Menu::Option, std::string>& optionTextMapForDrawer,
                             const BoundedIdx& highlightIdx)
@@ -120,7 +122,7 @@ void Menu::MenuDrawer::draw(const std::map<Menu::Option, std::string>& optionTex
     {
         drawOptionBox(text, 20 * (option+1) + BOX_HEIGHT * option, highlightIdx == option);
     }
-    graphics::addBorder(image);
+    graphics::addBorder(image, FRAME_COLOR);
 }
 
 void Menu::MenuDrawer::drawOptionBox(const std::string& text, int distanceFromTheTop, bool highlight)
@@ -129,7 +131,7 @@ void Menu::MenuDrawer::drawOptionBox(const std::string& text, int distanceFromTh
         BOX_HEIGHT, BOX_WIDTH, BOX_COLOR, text);
     if(highlight)
     {
-        graphics::addBorder(box);
+        graphics::addBorder(box, BOX_FRAME_COLOR);
     }
     constexpr auto w = (WIDTH - BOX_WIDTH) / 2;
     const cv::Point origin(w, distanceFromTheTop);
