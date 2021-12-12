@@ -2,6 +2,7 @@
 #include <time.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <functional>
 
 #include "Grid.hpp"
 #include "WinScreen.hpp"
@@ -40,7 +41,7 @@ private:
     int score {0};
     const std::vector<ColorScheme>& colorSchemes = ColorSchemeReader::getSchemes();
     const ColorScheme* currentColorScheme = &colorSchemes[0];
-    Grid grid {*currentColorScheme};
+    Grid grid {*currentColorScheme, [this](){showBoard();} };
     Menu menu {colorSchemes};
     GameStateHistory stateHistory;
 };

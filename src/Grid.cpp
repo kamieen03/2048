@@ -1,7 +1,8 @@
 #include "Grid.hpp"
 #include <iostream>
 
-Grid::Grid(const ColorScheme& cs)
+Grid::Grid(const ColorScheme& cs, std::function<void()> showBoardFunction)
+    : drawer(GridDrawer(&tiles, showBoardFunction))
 {
     for(int i = 0; i < 4; i++)
         for(int k = 0; k < 4; k++)
@@ -24,102 +25,155 @@ std::ostream& operator<<(std::ostream& os, const Grid& g)
 
 void Grid::updateColorScheme(const ColorScheme& cs)
 {
-    const auto backgroundColor = cs.getBackgroundColor();
-    gridImage = cv::Mat{IMAGE_SIZE, IMAGE_SIZE, CV_8UC3, backgroundColor};
-    for(int i = 0; i < 4; i++)
-        for(int k = 0; k < 4; k++)
-           tiles[i][k].updateColorScheme(cs);
-    refreshImage();
-}
-
-void Grid::refreshImage()
-{
-    for(int i = 0; i < 4; i++)
-        for(int k = 0; k < 4; k++)
-            refreshTileFace(tiles[i][k]);
-}
-
-void Grid::refreshTileFace(Tile& t)
-{
-    const auto& size = Tile::TILE_SIZE;
-    const auto& [i, k] = t.getPosition();
-    const cv::Point origin(size*k + 10*(k+1), size*i + 10*(i+1));
-    graphics::pasteRectangleOntoImage(t.getFace(), gridImage, origin);
+    drawer.updateColorScheme(cs);
 }
 
 void Grid::setTile(Tile& t, int value)
 {
     t.updateTile(value);
-    refreshTileFace(t);
+    drawer.refreshTileFace(t);
 }
-
 
 
 bool Grid::update(Key key)
 {
+    bool changedAtLeastOnce = false;
+    bool changedInThisRound = true;
+    std::vector<AnimationPair> animationPairs;
+    std::vector<TileUpdate> tileUpdates;
+    recomputeAllowedFusions();
+
+    while(changedInThisRound)
+    {
+        animationPairs.clear();
+        tileUpdates.clear();
+
+        changedInThisRound = computeUpdatesAndAnimationsForAllTiles(key, animationPairs, tileUpdates);
+        changedAtLeastOnce |= changedInThisRound;
+
+        if(changedInThisRound)
+        {
+            drawer.animate(animationPairs);
+            applyUpdates(tileUpdates);
+        }
+    }
+    if(changedAtLeastOnce)
+    {
+        drawer.refreshImage();
+    }
+    return changedAtLeastOnce;
+}
+
+bool Grid::computeUpdatesAndAnimationsForAllTiles(
+        Key key, std::vector<AnimationPair>& animationPairs,
+        std::vector<TileUpdate>& tileUpdates)
+{
     bool changed = false;
+    auto htf = [this, key, &animationPairs, &tileUpdates](Tile& tile, int& allowedFusionNumber){
+        return handleTile(tile, key, allowedFusionNumber, animationPairs, tileUpdates);
+    };
+
     switch (key)
     {
         case Key::UP:
-            for(int i = 1; i < 4; i++)
+            for(int i = 0; i < 4; i++)
                 for(int k = 0; k < 4; k++)
-                    changed |= handleTile(tiles[i][k], key);
+                    changed |= htf(tiles[i][k], allowedFusions.column[k]);
             break;
         case Key::DOWN:
-            for(int i = 2; i >= 0; i--)
+            for(int i = 3; i >= 0; i--)
                 for(int k = 0; k < 4; k++)
-                    changed |= handleTile(tiles[i][k], key);
+                    changed |= htf(tiles[i][k], allowedFusions.column[k]);
             break;
         case Key::LEFT:
-            for(int k = 1; k < 4; k++)
+            for(int k = 0; k < 4; k++)
                 for(int i = 0; i < 4; i++)
-                    changed |= handleTile(tiles[i][k], key);
+                    changed |= htf(tiles[i][k], allowedFusions.row[i]);
             break;
         case Key::RIGHT:
-            for(int k = 2; k >= 0; k--)
+            for(int k = 3; k >= 0; k--)
                 for(int i = 0; i < 4; i++)
-                    changed |= handleTile(tiles[i][k], key);
+                    changed |= htf(tiles[i][k], allowedFusions.row[i]);
             break;
-    }
-    if(changed)
-    {
-        refreshImage();
     }
     return changed;
 }
 
-bool Grid::handleTile(Tile& t, Key key)
+bool Grid::handleTile(Tile& t, Key key, int& allowedFusionNumber,
+                      std::vector<AnimationPair>& animationPairs,
+                      std::vector<TileUpdate>& tileUpdates)
 {
     if(t.empty())
     {
         return false;
     }
 
-    Tile* t1 = &t;
-    Tile* t2;
-    bool changed = false;
-    while(t2 = nextTile(*t1, key))
+    Tile* const tn = nextTile(t, key);
+    if(tn)
     {
-        if(t2->getValue() == t1->getValue())
+        if(tn->getValue() == t.getValue() and allowedFusionNumber > 0)
         {
-            t2->doubleTile();
-            t1->updateTile(0);
-            changed = true;          //at most one fusion of one tile
-            break;
+            tileUpdates.push_back([tn](){tn->doubleTile();});
+            tileUpdates.push_back([&t](){t.updateTile(0);});
+            allowedFusionNumber--;
+            animationPairs.push_back(AnimationPair{t, *tn});
+            return true;
         }
-        else if(t2->empty())
+        else if(tn->empty())
         {
-            t2->updateTile(t1->getValue());
-            t1->updateTile(0);
-            changed = true;
+            tileUpdates.push_back([tn, &t](){tn->updateTile(t.getValue());});
+            tileUpdates.push_back([&t](){t.updateTile(0);});
+            animationPairs.push_back(AnimationPair{t, *tn});
+            return true;
         }
-        else
-        {
-            break;
-        }
-        t1 = t2;
     }
-    return changed;
+    animationPairs.push_back(AnimationPair{t, t});
+    return false;
+}
+
+void Grid::applyUpdates(const std::vector<TileUpdate>& tileUpdates)
+{
+    for(const auto& update : tileUpdates)
+    {
+       update();
+    }
+}
+
+void Grid::recomputeAllowedFusions()
+{
+    for(int line = 0; line < 4; line++)
+    {
+        allowedFusions.column[line] = recomputeAllowedFusionsInLine(line, false);
+        allowedFusions.row[line]    = recomputeAllowedFusionsInLine(line, true);
+    }
+}
+
+int Grid::recomputeAllowedFusionsInLine(int line, bool rowOrder)
+{
+    int pairs {0};
+    int previousValue {0}, currentValue {0};
+    const Tile* t;
+    for(int k = 0; k < 4; k++)
+    {
+        if(rowOrder)
+            t = &tiles[line][k];
+        else
+            t = &tiles[k][line];
+
+        if((currentValue = t->getValue()) > 0)
+        {
+            if(currentValue == previousValue)
+            {
+                pairs++;
+                previousValue = 0;
+            }
+            else
+            {
+                previousValue = currentValue;
+            }
+        }
+    }
+    return pairs;
 }
 
 Tile* Grid::nextTile(const Tile& t, Key key)

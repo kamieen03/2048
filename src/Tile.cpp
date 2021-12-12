@@ -36,3 +36,10 @@ void Tile::updateColorScheme(const ColorScheme& cs)
     updateTile(value);
 }
 
+cv::Mat Tile::getEmpetyTileFace()
+{
+    const auto color = colorScheme->getEmptyTileColor();
+    return graphics::getColoredRectangleWithCenteredText(
+            TILE_SIZE, TILE_SIZE, color, "");
+}
+

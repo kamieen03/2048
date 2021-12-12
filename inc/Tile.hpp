@@ -1,3 +1,5 @@
+#pragma once
+
 #include <opencv2/imgproc.hpp>
 #include <opencv2/core/matx.hpp>
 #include <opencv2/core/mat.hpp>
@@ -19,10 +21,12 @@ public:
     void updateColorScheme(const ColorScheme& cs);
 
     void doubleTile(){updateTile(value*2);};
-    cv::Mat getFace() {return face;};
+    cv::Mat getFace() const {return face;};
     int getValue() const {return value;};
     bool empty() const {return value == 0;};
     Coordinate getPosition() const {return position;}
+
+    static cv::Mat getEmpetyTileFace();
 
     static constexpr int TILE_SIZE {150};
 

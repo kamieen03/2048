@@ -15,6 +15,7 @@ add_executable(2048 src/GameState.cpp
                     src/LoseScreen.cpp
                     src/Tile.cpp
                     src/Grid.cpp
+                    src/GridDrawer.cpp
                     src/Game.cpp
                     src/KeyHandler.cpp
                     src/main.cpp)
