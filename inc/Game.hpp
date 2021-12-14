@@ -14,10 +14,16 @@
 #include "graphics.hpp"
 #include "GameState.hpp"
 
+struct GameConfig
+{
+    bool headless {false};
+    bool nonAnimate {false};
+};
+
 class Game
 {
 public:
-    Game();
+    Game(const GameConfig& gc);
     int run();
 
 private:
@@ -35,13 +41,15 @@ private:
     void saveState();
     void undoMove();
 
+    const bool isHeadless;
+    const bool isAnimated;
 
     cv::Mat image {Grid::IMAGE_SIZE, Grid::IMAGE_SIZE, CV_8UC3, CV_RGB(0,0,0)};
     bool achieved2048 {false};
     int score {0};
     const std::vector<ColorScheme>& colorSchemes = ColorSchemeReader::getSchemes();
     const ColorScheme* currentColorScheme = &colorSchemes[0];
-    Grid grid {*currentColorScheme, [this](){showBoard();} };
+    Grid grid {*currentColorScheme, [this](){showBoard();}, isAnimated};
     Menu menu {colorSchemes};
     GameStateHistory stateHistory;
 };

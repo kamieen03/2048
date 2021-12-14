@@ -22,7 +22,7 @@ using Key = KeyHandler::Key;
 class Grid
 {
 public:
-    Grid(const ColorScheme& cs, std::function<void()> showBoardFunction);
+    Grid(const ColorScheme& cs, std::function<void()> showBoardFunction, bool isAnimated);
     friend std::ostream& operator<<(std::ostream& os, const Grid& g);
     void updateColorScheme(const ColorScheme& cs);
     void setTile(Tile& t, int value);
@@ -59,5 +59,6 @@ private:
         std::array<int, 4> row;
     } allowedFusions;
     GridDrawer drawer;
+    bool isAnimated;
 };
 

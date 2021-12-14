@@ -1,8 +1,9 @@
 #include "Grid.hpp"
 #include <iostream>
 
-Grid::Grid(const ColorScheme& cs, std::function<void()> showBoardFunction)
-    : drawer(GridDrawer(&tiles, showBoardFunction))
+Grid::Grid(const ColorScheme& cs, std::function<void()> showBoardFunction, bool isAnimated)
+    : drawer(GridDrawer(&tiles, showBoardFunction)),
+      isAnimated(isAnimated)
 {
     for(int i = 0; i < 4; i++)
         for(int k = 0; k < 4; k++)
@@ -51,11 +52,11 @@ bool Grid::update(Key key)
         changedInThisRound = computeUpdatesAndAnimationsForAllTiles(key, animationPairs, tileUpdates);
         changedAtLeastOnce |= changedInThisRound;
 
-        if(changedInThisRound)
+        if(changedInThisRound and isAnimated)
         {
             drawer.animate(animationPairs);
-            applyUpdates(tileUpdates);
         }
+        applyUpdates(tileUpdates);
     }
     if(changedAtLeastOnce)
     {

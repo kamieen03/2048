@@ -1,7 +1,9 @@
 #include "Game.hpp"
 #include <iostream>
 
-Game::Game()
+Game::Game(const GameConfig& gc)
+    : isHeadless(gc.headless),      // TODO: implement headless API
+      isAnimated(!gc.nonAnimate)
 {
     srand(time(NULL));
     cv::namedWindow("2048", CV_WINDOW_AUTOSIZE);
