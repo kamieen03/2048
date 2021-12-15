@@ -43,12 +43,9 @@ private:
     friend GridDrawer;
 
     bool computeUpdatesAndAnimationsForAllTiles(
-            Key key, std::vector<AnimationPair>& animationPairs,
-            std::vector<TileUpdate>& tileUpdates);
+            Key key, std::vector<AnimationPair>& animationPairs);
     bool handleTile(Tile& t, Key key, int& allowedFusionNumber,
-                    std::vector<AnimationPair>& animationPairs,
-                    std::vector<TileUpdate>& tileUpdates);
-    void applyUpdates(const std::vector<TileUpdate>& tileUpdates);
+                    std::vector<AnimationPair>& animationPairs);
     void recomputeAllowedFusions();
     int recomputeAllowedFusionsInLine(int line, bool rowOrder);
     Tile* nextTile(const Tile& t, Key key);

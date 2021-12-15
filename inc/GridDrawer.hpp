@@ -7,8 +7,17 @@
 
 struct AnimationPair
 {
-    const Tile& originTile;
-    const Tile& targetTile;
+public:
+    AnimationPair(const Tile& originTile, const Tile& targetTile)
+        : origin(originTile.getPosition()),
+          target(targetTile.getPosition()),
+          face(originTile.getFace())
+    {}
+private:
+    const Coordinate origin;
+    const Coordinate target;
+    cv::Mat face;
+friend class GridDrawer;
 };
 
 class GridDrawer
@@ -17,7 +26,7 @@ public:
     GridDrawer(std::array<std::array<Tile,4>,4>* tiles, std::function<void()> showBoard);
     void refreshImage();
     void refreshTileFace(Tile& t);
-    void animate(std::vector<AnimationPair>& animationPairs);
+    void animate(const std::vector<AnimationPair>& animationPairs);
     void updateColorScheme(const ColorScheme& cs);
     cv::Mat getImage() const {return gridImage.clone();};
 

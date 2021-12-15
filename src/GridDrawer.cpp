@@ -40,17 +40,17 @@ void GridDrawer::refreshTileFace(Tile& t)
     graphics::pasteRectangleOntoImage(t.getFace(), gridImage, origin);
 }
 
-void GridDrawer::animate(std::vector<AnimationPair>& animationPairs)
+void GridDrawer::animate(const std::vector<AnimationPair>& animationPairs)
 {
     for(int k = 1; k <= ANIMATION_STEPS; k++)
     {
         refreshBaseGridImage();
         for(const auto& ap : animationPairs)
         {
-            const auto pos1 = coordinateToPixel(ap.originTile.getPosition());
-            const auto pos2 = coordinateToPixel(ap.targetTile.getPosition());
+            const auto pos1 = coordinateToPixel(ap.origin);
+            const auto pos2 = coordinateToPixel(ap.target);
             const auto pos  = interpolate(pos1, pos2, k, ANIMATION_STEPS);
-            graphics::pasteRectangleOntoImage(ap.originTile.getFace(), gridImage, pos);
+            graphics::pasteRectangleOntoImage(ap.face, gridImage, pos);
         }
         showBoard();
         cv::waitKey(1);

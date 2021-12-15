@@ -41,22 +41,19 @@ bool Grid::update(Key key)
     bool changedAtLeastOnce = false;
     bool changedInThisRound = true;
     std::vector<AnimationPair> animationPairs;
-    std::vector<TileUpdate> tileUpdates;
     recomputeAllowedFusions();
 
     while(changedInThisRound)
     {
         animationPairs.clear();
-        tileUpdates.clear();
 
-        changedInThisRound = computeUpdatesAndAnimationsForAllTiles(key, animationPairs, tileUpdates);
+        changedInThisRound = computeUpdatesAndAnimationsForAllTiles(key, animationPairs);
         changedAtLeastOnce |= changedInThisRound;
 
         if(changedInThisRound and isAnimated)
         {
             drawer.animate(animationPairs);
         }
-        applyUpdates(tileUpdates);
     }
     if(changedAtLeastOnce)
     {
@@ -66,12 +63,11 @@ bool Grid::update(Key key)
 }
 
 bool Grid::computeUpdatesAndAnimationsForAllTiles(
-        Key key, std::vector<AnimationPair>& animationPairs,
-        std::vector<TileUpdate>& tileUpdates)
+        Key key, std::vector<AnimationPair>& animationPairs)
 {
     bool changed = false;
-    auto htf = [this, key, &animationPairs, &tileUpdates](Tile& tile, int& allowedFusionNumber){
-        return handleTile(tile, key, allowedFusionNumber, animationPairs, tileUpdates);
+    auto htf = [this, key, &animationPairs](Tile& tile, int& allowedFusionNumber){
+        return handleTile(tile, key, allowedFusionNumber, animationPairs);
     };
 
     switch (key)
@@ -101,8 +97,7 @@ bool Grid::computeUpdatesAndAnimationsForAllTiles(
 }
 
 bool Grid::handleTile(Tile& t, Key key, int& allowedFusionNumber,
-                      std::vector<AnimationPair>& animationPairs,
-                      std::vector<TileUpdate>& tileUpdates)
+                      std::vector<AnimationPair>& animationPairs)
 {
     if(t.empty())
     {
@@ -114,30 +109,22 @@ bool Grid::handleTile(Tile& t, Key key, int& allowedFusionNumber,
     {
         if(tn->getValue() == t.getValue() and allowedFusionNumber > 0)
         {
-            tileUpdates.push_back([tn](){tn->doubleTile();});
-            tileUpdates.push_back([&t](){t.updateTile(0);});
+            animationPairs.emplace_back(t, *tn);
+            tn->doubleTile();
+            t.updateTile(0);
             allowedFusionNumber--;
-            animationPairs.push_back(AnimationPair{t, *tn});
             return true;
         }
         else if(tn->empty())
         {
-            tileUpdates.push_back([tn, &t](){tn->updateTile(t.getValue());});
-            tileUpdates.push_back([&t](){t.updateTile(0);});
-            animationPairs.push_back(AnimationPair{t, *tn});
+            animationPairs.emplace_back(t, *tn);
+            tn->updateTile(t.getValue());
+            t.updateTile(0);
             return true;
         }
     }
-    animationPairs.push_back(AnimationPair{t, t});
+    animationPairs.emplace_back(t, t);
     return false;
-}
-
-void Grid::applyUpdates(const std::vector<TileUpdate>& tileUpdates)
-{
-    for(const auto& update : tileUpdates)
-    {
-       update();
-    }
 }
 
 void Grid::recomputeAllowedFusions()
@@ -149,6 +136,10 @@ void Grid::recomputeAllowedFusions()
     }
 }
 
+// Finds number of consecutive pairs. If tiles of the same value
+// are separated by empty tiles, they are still considered pairs.
+// It might be needlesly complicated for 4x4 grid, but if generalizes
+// directly to bigger grids.
 int Grid::recomputeAllowedFusionsInLine(int line, bool rowOrder)
 {
     int pairs {0};
