@@ -3,6 +3,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <functional>
+#include <array>
 
 #include "Grid.hpp"
 #include "WinScreen.hpp"
@@ -20,14 +21,31 @@ struct GameConfig
     bool nonAnimate {false};
 };
 
+struct APIInfo
+{
+using PlaneState = std::array<std::array<int,4>,4>;
+
+public:
+    PlaneState state;
+    unsigned int score{0};
+    int reward{0};
+    bool lost{false};
+    bool achieved2048{false};
+
+private:
+    bool changed {true};
+friend class Game;
+};
+
 class Game
 {
 public:
     Game(const GameConfig& gc);
     int run();
+    const APIInfo& step(KeyHandler::Key key);
 
 private:
-    void renderElement();
+    int renderElement();
     void showBoard();
     bool updateGrid(KeyHandler::Key);
     CQDecision showWinScreen();
@@ -52,5 +70,7 @@ private:
     Grid grid {*currentColorScheme, [this](){showBoard();}, isAnimated};
     Menu menu {colorSchemes};
     GameStateHistory stateHistory;
+
+    APIInfo apiInfo;
 };
 

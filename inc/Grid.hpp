@@ -33,6 +33,7 @@ public:
     bool canMove();
     std::vector<Tile*> getFreeTiles();
     cv::Mat getImage() const {return drawer.getImage();};
+    std::array<std::array<int,4>,4> getAbstractState() const;
     friend bool operator==(const Grid& g1, const Grid& g2);
 
     static constexpr int IMAGE_SIZE = GridDrawer::IMAGE_SIZE;

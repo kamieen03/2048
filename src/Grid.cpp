@@ -258,6 +258,15 @@ std::vector<Tile*> Grid::getFreeTiles()
     return freeTiles;
 }
 
+std::array<std::array<int,4>,4> Grid::getAbstractState() const
+{
+    std::array<std::array<int,4>,4> state;
+    for(int i = 0; i < 4; i++)
+        for(int k = 0; k < 4; k++)
+            state[i][k] = tiles[i][k].getValue();
+    return state;
+}
+
 bool operator==(const Grid& g1, const Grid& g2)
 {
     for(int i = 0; i < 4; i++)

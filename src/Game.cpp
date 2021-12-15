@@ -6,7 +6,10 @@ Game::Game(const GameConfig& gc)
       isAnimated(!gc.nonAnimate)
 {
     srand(time(NULL));
-    cv::namedWindow("2048", CV_WINDOW_AUTOSIZE);
+    if(!isHeadless)
+    {
+        cv::namedWindow("2048", CV_WINDOW_AUTOSIZE);
+    }
 }
 
 int Game::run()
@@ -62,19 +65,60 @@ int Game::run()
     return score;
 }
 
-void Game::renderElement()
+const APIInfo& Game::step(KeyHandler::Key key)
+{
+    if(!grid.isFull() and apiInfo.changed)
+    {
+        apiInfo.score += renderElement();
+    }
+    showBoard();
+
+    if(!grid.canMove())
+    {
+        apiInfo.lost = true;
+        return apiInfo;
+    }
+
+    if(key == KeyHandler::Key::BACK)
+    {
+        undoMove();
+        apiInfo.reward = -2;
+    }
+    else
+    {
+        saveState();
+        apiInfo.reward = 1;
+    }
+
+    apiInfo.changed = updateGrid(key);
+    showBoard();
+
+    if(!achieved2048 && grid.has2048())
+    {
+        apiInfo.achieved2048 = true;
+        achieved2048 = true;
+    }
+    apiInfo.state = grid.getAbstractState();
+    return apiInfo;
+}
+
+int Game::renderElement()
 {
     const auto freeTiles = grid.getFreeTiles();
     const auto N = freeTiles.size();
-    const auto randomFreeTile = freeTiles[rand() % N];
+    const auto& randomFreeTile = freeTiles[rand() % N];
     const auto newNumber = rand() % 4 <= 1 ? 2 : 4;
     grid.setTile(*randomFreeTile, newNumber);
+    return newNumber;
 }
 
 void Game::showBoard()
 {
-    image = grid.getImage();
-    cv::imshow("2048", image);
+    if(!isHeadless)
+    {
+        image = grid.getImage();
+        cv::imshow("2048", image);
+    }
 }
 
 bool Game::updateGrid(KeyHandler::Key key)
