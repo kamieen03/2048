@@ -1,4 +1,9 @@
+#include <filesystem>
+#include <iostream>
+
 #include "ColorSchemeReader.hpp"
+
+namespace fs = std::filesystem;
 
 ColorScheme::ColorScheme(const std::map<int, cv::Scalar>& tileColors,
                          const cv::Scalar& emptyTileColor,
@@ -83,7 +88,9 @@ namespace ColorSchemeReader
         {
             return schemes;
         }
-        std::ifstream file("/home/kamil/Pulpit/2048/color_schemes.co");
+        const auto path =
+            fs::path(__FILE__).parent_path().parent_path() / "color_schemes.co";
+        std::ifstream file(path);
         ColorScheme::Builder csb;
         int settingTiles{0};
         bool settingEmptyTile{false}, settingBackground{false};
