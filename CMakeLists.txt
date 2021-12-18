@@ -5,4 +5,5 @@ set(CMAKE_BUILD_TYPE RELEASE)
 set(COMPILE_FLAGS -Wall -Weffc++ -Wextra -Wsign-conversion -pedantic-errors)
 
 add_subdirectory(game)
+add_subdirectory(bot)
 
