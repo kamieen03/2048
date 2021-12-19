@@ -1,4 +1,4 @@
-include_directories( ../game/inc inc )
+include_directories( ../common/inc ../game/inc inc )
 
 set(CMAKE_PREFIX_PATH "/usr/local/lib/libtorch")
 find_package(Torch REQUIRED)

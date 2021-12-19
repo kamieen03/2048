@@ -1,28 +1,31 @@
 #include <array>
+#include <queue>
 #include <memory>
 
 #include "State.hpp"
 #include "KeyHandler.hpp"
+#include "FIFOBuffer.hpp"
+
+using Action = KeyHandler::Key;
 
 struct Transition
 {
-    using Action = KeyHandler::Key;
-    const State state;
-    const Action action;
-    const State nextState;
-    const int reward;
+    State state;
+    Action action;
+    State nextState;
+    int reward;
 };
 
 class ReplayMemory
 {
 public:
-    ReplayMemory();
-    std::array<const Transition* const, BATCH_SIZE> sample const ();
-
     constexpr static size_t BATCH_SIZE{32};
 
+    void push(const Transition& t);
+    std::vector<const Transition*> sample() const;
+
 private:
-    class CircularBuffer;
-    std::unique_ptr<CircularBuffer> buffer;
+    constexpr static size_t SIZE{200000};
+    FIFOBuffer<Transition> data{SIZE};
 };
 

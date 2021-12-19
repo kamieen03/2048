@@ -9,5 +9,5 @@ public:
 
 private:
     torch::Tensor state;
-}
+};
 
