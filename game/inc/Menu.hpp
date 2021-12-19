@@ -9,6 +9,8 @@
 #include "graphics.hpp"
 #include "CQDecision.hpp"
 #include "ColorSchemeReader.hpp"
+#include "RotationalIdx.hpp"
+#include "BoundedIdx.hpp"
 
 using Key = KeyHandler::Key;
 
@@ -28,32 +30,6 @@ public:
     SignalSet handleKey(Key key);
 
 private:
-    class RotationalIdx
-    {
-    public:
-        RotationalIdx(int numStates);
-        int getValue() const {return idx;}
-        RotationalIdx& operator++();
-        RotationalIdx& operator--();
-    private:
-        int idx {0};
-        const int numStates;
-    };
-
-    class BoundedIdx
-    {
-    public:
-        BoundedIdx(int max);
-        int getValue() const {return idx;}
-        BoundedIdx& operator++();
-        BoundedIdx& operator--();
-    private:
-        int idx {0};
-        static constexpr int min {0};
-        const int max;
-    };
-    friend bool operator==(const BoundedIdx& lhs, int rhs);
-
     enum Option : int
     {
         ChangeColorScheme = 0,

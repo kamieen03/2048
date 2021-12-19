@@ -1,7 +1,9 @@
 find_package( OpenCV REQUIRED )
-include_directories( inc ${OpenCV_INCLUDE_DIRS} )
+include_directories( inc ../common/inc ${OpenCV_INCLUDE_DIRS} )
 add_executable(2048 src/GameState.cpp
                     src/graphics.cpp
+                    ../common/src/BoundedIdx.cpp
+                    ../common/src/RotationalIdx.cpp
                     src/Menu.cpp
                     src/ColorSchemeReader.cpp
                     src/WinScreen.cpp
