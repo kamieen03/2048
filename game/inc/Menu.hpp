@@ -44,12 +44,13 @@ private:
         void draw(const std::map<Menu::Option, std::string>& optionTextMapForDrawer,
                   const BoundedIdx& highlightIdx);
 
-        static constexpr int HEIGHT {500};
-        static constexpr int WIDTH  {300};
+        static constexpr int HEIGHT {290};
+        static constexpr int WIDTH  {350};
         static const cv::Scalar COLOR;
         static const cv::Scalar FRAME_COLOR;
-        static constexpr int BOX_HEIGHT {70};
-        static constexpr int BOX_WIDTH  {WIDTH*2/3};
+        static constexpr int BOX_INTERLINE {20};
+        static constexpr int BOX_HEIGHT    {70};
+        static constexpr int BOX_WIDTH     {WIDTH*4/5};
         static const cv::Scalar BOX_COLOR;
         static const cv::Scalar BOX_FRAME_COLOR;
 

@@ -93,7 +93,7 @@ auto Menu::getMapForDrawer() const
 {
     std::map<Option, std::string> optionTextMapForDrawer;
     optionTextMapForDrawer[Option::ChangeColorScheme] =
-        getActiveScheme().getName();
+        "<" + getActiveScheme().getName() + ">";
     optionTextMapForDrawer[Option::Continue] = "Continue";
     optionTextMapForDrawer[Option::Quit] = "Quit";
     return optionTextMapForDrawer;
@@ -120,7 +120,9 @@ void Menu::MenuDrawer::draw(const std::map<Menu::Option, std::string>& optionTex
     assert(optionTextMapForDrawer.size() == 3);
     for(const auto& [option, text] : optionTextMapForDrawer)
     {
-        drawOptionBox(text, 20 * (option+1) + BOX_HEIGHT * option, highlightIdx == option);
+        drawOptionBox(text,
+                      BOX_INTERLINE * (option+1) + BOX_HEIGHT * option,
+                      highlightIdx == option);
     }
     graphics::addBorder(image, FRAME_COLOR);
 }
